@@ -1,0 +1,11 @@
+# Apache 2.4
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+# Exclude the logo.png file
+<files logo.png>
+	Order Allow,Deny
+	Allow from all
+	Satisfy any
+</files>

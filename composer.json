@@ -1,0 +1,14 @@
+{
+  "name": "ch/clockwork",
+  "description": "Prestashop integration for Clockwork",
+  "type": "prestashop-module",
+  "require": {
+    "itsgoingd/clockwork": "^5.0"
+  },
+  "authors": [
+    {
+      "name": "Bogdan Barbu",
+      "email": "bogdan.b@codingheads.com"
+    }
+  ]
+}
