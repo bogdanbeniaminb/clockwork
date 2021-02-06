@@ -16,7 +16,7 @@ class Module extends ModuleCore
         $memoryStart = memory_get_usage();
         $result = parent::coreLoadModule($moduleName);
         if (!class_exists(Profiler::class)) {
-            include_once(_PS_MODULE_DIR_ . 'clockwork/classes/autoload.php');
+            include_once(_PS_MODULE_DIR_ . 'clockwork/vendor/autoload.php');
         }
         $timeEnd = microtime(true);
         if (class_exists(Profiler::class)) {

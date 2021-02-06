@@ -23,8 +23,6 @@ if (!defined('_PS_VERSION_')) {
     exit();
 }
 
-require_once dirname(__FILE__) . '/classes/autoload.php';
-
 define('CLOCKWORK_DIR', dirname(__FILE__));
 
 /** add composer autoload */
@@ -63,7 +61,7 @@ class Clockwork extends Module
     {
         $this->name = 'clockwork';
         $this->tab = 'others';
-        $this->version = '1.0.3';
+        $this->version = '1.0.4';
         $this->author = 'Bogdan Barbu';
         $this->need_instance = 1;
         $this->ps_versions_compliancy = [

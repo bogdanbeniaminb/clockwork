@@ -8,4 +8,5 @@ $baseDir = dirname($vendorDir);
 return array(
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
     'Clockwork\\' => array($vendorDir . '/itsgoingd/clockwork/Clockwork'),
+    'BB\\Clockwork\\' => array($baseDir . '/classes'),
 );

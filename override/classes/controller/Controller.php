@@ -10,7 +10,7 @@ abstract class Controller extends ControllerCore
     {
         if (_PS_MODE_DEV_) {
             if (!class_exists(Profiler::class)) {
-                include_once(_PS_MODULE_DIR_ . 'clockwork/classes/autoload.php');
+                include_once(_PS_MODULE_DIR_ . 'clockwork/vendor/autoload.php');
             }
             if (class_exists(Profiler::class)) {
                 $this->profiler = Profiler::getInstance();
