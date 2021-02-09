@@ -241,15 +241,81 @@ class Profiler
         arsort(Db::getInstance()->tables);
         arsort(Db::getInstance()->uniqQueries);
 
-        uasort($this->hooksPerfs, [$this, 'sortByQueryTime']);
-        foreach ($this->hooksPerfs as $hook_name => $hook_data) {
+        // add the hooks
+        foreach ($this->hooksPerfs as $hook_name => $data) {
             clock()->event(sprintf("Hook: %s", $hook_name), [
                 'name' => $hook_name,
-                'start' => $hook_data['start'],
-                'end' => $hook_data['start'] + $hook_data['time'],
+                'start' => $data['start'],
+                'end' => $data['start'] + $data['time'],
+                'memory' => $data['memory'],
             ]);
         }
 
+        // add the modules
+        foreach ($this->modulesPerfs as $data) {
+            clock()->event(sprintf("Module (__construct): %s", $data['module']), [
+                'name' => $data['module'],
+                'start' => $data['start'],
+                'end' => $data['end'],
+                'memory' => $data['memory'],
+            ]);
+        }
+
+
+        $info = $this->clock()->userData('prestashop')
+            ->title('Prestashop Info');
+
+        $smarty_compilation_types = [
+            0 => 'Never recompile',
+            1 => 'Recompile if updated',
+            2 => 'Force',
+        ];
+
+        $info->counters([
+            'Prestashop Version' => _PS_VERSION_,
+            'PHP Version' => PHP_VERSION,
+            'MySQL Version' => Db::getInstance()->getVersion(),
+            'Memory Limit' => ini_get('memory_limit'),
+            'Max Execution Time' => ini_get('max_execution_time') . 's',
+            'Smarty Cache' => Configuration::get('PS_SMARTY_CACHE') ? 'Cached' : 'Uncached',
+            'Smarty Compilation' => $smarty_compilation_types[Configuration::get('PS_SMARTY_FORCE_COMPILE')] ?? 'N/A',
+        ]);
+
+        $info->counters([
+            'Hooks' => count($this->hooksPerfs),
+            'Total Hooks Time' => round($this->totalHooksTime * 1000, 1) . 'ms',
+            'Total Hooks Memory' => $this->totalHooksMemory,
+            'Modules' => count($this->modulesPerfs),
+            'Total Modules Time' => round($this->totalModulesTime * 1000, 1) . 'ms',
+            'Total Modules Memory' => $this->totalModulesMemory,
+        ]);
+
+        // add the table with hooks
+        $hooks = [];
+        foreach ($this->hooksPerfs as $hook_name => $data) {
+            $hooks[] = [
+                'name' => $hook_name,
+                'duration' => round($data['time'] * 1000, 1) . 'ms',
+                'memory' => $data['memory'],
+            ];
+        }
+        $info->table('Hooks', $hooks);
+
+        // add the modules table
+        $modules = [];
+        foreach ($this->modulesPerfs as $data) {
+            $name = $data['module'];
+            if (!isset($modules[$name])) {
+                $modules[$name] = [
+                    'name' => $name,
+                    'duration' => 0,
+                    'memory' => 0,
+                ];
+            }
+            $modules[$name]['duration'] += round(($data['end'] - $data['start']) * 1000, 2);
+            $modules[$name]['memory'] += $data['memory'];
+        }
+        $info->table('Modules', $modules);
 
         $this->sendData();
     }
@@ -302,8 +368,6 @@ class Profiler
             'objectmodel' => ObjectModel::$debug_list,
             'files' => get_included_files(),
         ];
-
-        dump($data);
 
         return $data;
     }

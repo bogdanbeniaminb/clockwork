@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use BB\Clockwork\Profiler;
 
 class SmartyDevTemplate extends SmartyDevTemplateCore
@@ -11,7 +9,7 @@ class SmartyDevTemplate extends SmartyDevTemplateCore
         $profiler = null;
         if (_PS_MODE_DEV_) {
             if (!class_exists(Profiler::class)) {
-                include_once(_PS_MODULE_DIR_ . 'clockwork/vendor/autoload.php');
+                @include_once(_PS_MODULE_DIR_ . 'clockwork/vendor/autoload.php');
             }
             if (class_exists(Profiler::class)) {
                 $profiler = Profiler::getInstance();
@@ -25,8 +23,14 @@ class SmartyDevTemplate extends SmartyDevTemplateCore
         $end = microtime(true);
 
         if ($profiler) {
-            $profiler->addView($template, [
-                'template' => $template,
+            if (null !== $template) {
+                $tpl = $template->template_resource;
+            } else {
+                $tpl = $this->template_resource;
+            }
+
+            $profiler->addView($tpl, [
+                'template' => $tpl,
                 'cache_id' => $cache_id,
                 'compile_id' => $compile_id,
                 'parent' => $parent,
@@ -35,7 +39,7 @@ class SmartyDevTemplate extends SmartyDevTemplateCore
                 'no_output_filter' => $no_output_filter,
             ], [
                 'time' => $start,
-                'duration' => ($end - $start)*1000,
+                'duration' => ($end - $start) * 1000,
             ]);
         }
 

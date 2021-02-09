@@ -1,0 +1,1 @@
+C:37:"PHPUnit\Runner\DefaultTestResultCache":270:{a:2:{s:7:"defects";a:2:{s:7:"Warning";i:6;s:79:"BB\Clockwork\Tests\TagParserTest::test_it_parses_a_comma_separated_list_of_tags";i:4;}s:5:"times";a:2:{s:7:"Warning";d:0.002;s:79:"BB\Clockwork\Tests\TagParserTest::test_it_parses_a_comma_separated_list_of_tags";d:0.002;}}}

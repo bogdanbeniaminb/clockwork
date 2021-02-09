@@ -3,7 +3,8 @@
   "description": "Prestashop integration for Clockwork",
   "type": "prestashop-module",
   "require": {
-    "itsgoingd/clockwork": "^5.0"
+    "itsgoingd/clockwork": "^5.0",
+    "phpunit/phpunit": "^9.5"
   },
   "authors": [
     {
@@ -13,7 +14,12 @@
   ],
   "autoload": {
     "psr-4": {
-        "BB\\Clockwork\\": "classes"
+      "BB\\Clockwork\\": "classes/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "BB\\Clockwork\\Tests\\": "tests/"
     }
   }
 }

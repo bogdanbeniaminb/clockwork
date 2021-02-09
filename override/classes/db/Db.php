@@ -2,47 +2,11 @@
 
 abstract class Db extends DbCore
 {
-
-    /**
-     * Add SQL_NO_CACHE in SELECT queries
-     *
-     * @var bool
-     */
     public $disableCache = _PS_MODE_DEV_;
-
-    /**
-     * Total of queries
-     *
-     * @var int
-     */
     public $count = 0;
-
-    /**
-     * List of queries
-     *
-     * @var array
-     */
     public $queries = [];
-
-    /**
-     * List of uniq queries (replace numbers by XX)
-     *
-     * @var array
-     */
     public $uniqQueries = [];
-
-    /**
-     * List of tables
-     *
-     * @var array
-     */
     public $tables = [];
-
-    /**
-     * Execute the query and log some informations
-     *
-     * @see DbCore::query()
-     */
     public function query($sql)
     {
         if (!_PS_MODE_DEV_) {

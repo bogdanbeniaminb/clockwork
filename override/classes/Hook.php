@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use BB\Clockwork\Profiler;
 
 class Hook extends HookCore
@@ -21,7 +19,7 @@ class Hook extends HookCore
         $timeEnd = microtime(true);
 
         if (!class_exists(Profiler::class)) {
-            include_once(_PS_MODULE_DIR_ . 'clockwork/vendor/autoload.php');
+            @include_once(_PS_MODULE_DIR_ . 'clockwork/vendor/autoload.php');
         }
         if (class_exists(Profiler::class)) {
             Profiler::getInstance()->interceptHook(
