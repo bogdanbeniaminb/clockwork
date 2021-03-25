@@ -291,31 +291,35 @@ class Profiler
         ]);
 
         // add the table with hooks
-        $hooks = [];
-        foreach ($this->hooksPerfs as $hook_name => $data) {
-            $hooks[] = [
-                'name' => $hook_name,
-                'duration' => round($data['time'] * 1000, 1) . 'ms',
-                'memory' => $data['memory'],
-            ];
-        }
-        $info->table('Hooks', $hooks);
-
-        // add the modules table
-        $modules = [];
-        foreach ($this->modulesPerfs as $data) {
-            $name = $data['module'];
-            if (!isset($modules[$name])) {
-                $modules[$name] = [
-                    'name' => $name,
-                    'duration' => 0,
-                    'memory' => 0,
+        if ($this->hooksPerfs) {
+            $hooks = [];
+            foreach ($this->hooksPerfs as $hook_name => $data) {
+                $hooks[] = [
+                    'name' => $hook_name,
+                    'duration' => round($data['time'] * 1000, 1) . 'ms',
+                    'memory' => $data['memory'],
                 ];
             }
-            $modules[$name]['duration'] += round(($data['end'] - $data['start']) * 1000, 2);
-            $modules[$name]['memory'] += $data['memory'];
+            $info->table('Hooks', $hooks);
         }
-        $info->table('Modules', $modules);
+
+        // add the modules table
+        if ($this->modulesPerfs) {
+            $modules = [];
+            foreach ($this->modulesPerfs as $data) {
+                $name = $data['module'];
+                if (!isset($modules[$name])) {
+                    $modules[$name] = [
+                        'name' => $name,
+                        'duration' => 0,
+                        'memory' => 0,
+                    ];
+                }
+                $modules[$name]['duration'] += round(($data['end'] - $data['start']) * 1000, 2);
+                $modules[$name]['memory'] += $data['memory'];
+            }
+            $info->table('Modules', $modules);
+        }
 
         $this->sendData();
     }

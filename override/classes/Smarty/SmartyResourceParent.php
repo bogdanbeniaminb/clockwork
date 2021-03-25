@@ -1,7 +1,5 @@
 <?php
 
-use BB\Clockwork\Profiler;
-
 class SmartyResourceParent extends SmartyResourceParentCore
 {
     protected function fetch($name, &$source, &$mtime)
@@ -15,11 +13,11 @@ class SmartyResourceParent extends SmartyResourceParentCore
                         '<!-- end ' . $file . ' -->',
                     ]);
 
-                    if (!class_exists(Profiler::class)) {
+                    if (!class_exists(BB\Clockwork\Profiler::class)) {
                         @include_once(_PS_MODULE_DIR_ . 'clockwork/vendor/autoload.php');
                     }
-                    if (class_exists(Profiler::class)) {
-                        $profiler = Profiler::getInstance();
+                    if (class_exists(BB\Clockwork\Profiler::class)) {
+                        $profiler = BB\Clockwork\Profiler::getInstance();
                         $profiler->addView($file, [
                             'template' => $file,
                             'name' => $name,

@@ -2,7 +2,7 @@
 
 abstract class Db extends DbCore
 {
-    public $disableCache = _PS_MODE_DEV_;
+    public $disableCache = !!_PS_MODE_DEV_;
     public $count = 0;
     public $queries = [];
     public $uniqQueries = [];

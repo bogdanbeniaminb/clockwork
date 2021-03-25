@@ -1,18 +1,16 @@
 <?php
 
-use BB\Clockwork\Profiler;
-
 class SmartyDevTemplate extends SmartyDevTemplateCore
 {
     public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false)
     {
         $profiler = null;
         if (_PS_MODE_DEV_) {
-            if (!class_exists(Profiler::class)) {
+            if (!class_exists(BB\Clockwork\Profiler::class)) {
                 @include_once(_PS_MODULE_DIR_ . 'clockwork/vendor/autoload.php');
             }
-            if (class_exists(Profiler::class)) {
-                $profiler = Profiler::getInstance();
+            if (class_exists(BB\Clockwork\Profiler::class)) {
+                $profiler = BB\Clockwork\Profiler::getInstance();
             }
         }
 
