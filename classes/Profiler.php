@@ -284,10 +284,10 @@ class Profiler
         $info->counters([
             'Hooks' => count($this->hooksPerfs),
             'Total Hooks Time' => round($this->totalHooksTime * 1000, 1) . 'ms',
-            'Total Hooks Memory' => $this->totalHooksMemory,
+            'Total Hooks Memory' => $this->getHumanReadableSize($this->totalHooksMemory),
             'Modules' => count($this->modulesPerfs),
             'Total Modules Time' => round($this->totalModulesTime * 1000, 1) . 'ms',
-            'Total Modules Memory' => $this->totalModulesMemory,
+            'Total Modules Memory' => $this->getHumanReadableSize($this->totalModulesMemory),
         ]);
 
         // add the table with hooks
@@ -300,6 +300,11 @@ class Profiler
                     'memory' => $data['memory'],
                 ];
             }
+
+            foreach ($hooks as &$hook) {
+                $hook['memory'] = $this->getHumanReadableSize($hook['memory']);
+            }
+
             $info->table('Hooks', $hooks);
         }
 
@@ -318,6 +323,11 @@ class Profiler
                 $modules[$name]['duration'] += round(($data['end'] - $data['start']) * 1000, 2);
                 $modules[$name]['memory'] += $data['memory'];
             }
+
+            foreach ($modules as &$module) {
+                $module['memory'] = $this->getHumanReadableSize($module['memory']);
+            }
+
             $info->table('Modules', $modules);
         }
 
@@ -359,12 +369,12 @@ class Profiler
             'hooks' => [
                 'perfs' => $this->hooksPerfs,
                 'totalHooksTime' => $this->totalHooksTime,
-                'totalHooksMemory' => $this->totalHooksMemory,
+                'totalHooksMemory' => $this->getHumanReadableSize($this->totalHooksMemory),
             ],
             'modules' => [
                 'perfs' => $this->modulesPerfs,
                 'totalHooksTime' => $this->totalModulesTime,
-                'totalHooksMemory' => $this->totalModulesMemory,
+                'totalHooksMemory' => $this->getHumanReadableSize($this->totalModulesMemory),
             ],
             'stopwatchQueries' => $this->queries,
             'doublesQueries' => Db::getInstance()->uniqQueries,
@@ -406,5 +416,18 @@ class Profiler
     public function addView(...$args)
     {
         clock()->addView(...$args);
+    }
+
+    /**
+     * get the human readable size
+     * @param integer $bytes
+     * @return string
+     */
+    protected function getHumanReadableSize($bytes)
+    {
+        $bytes = (int) $bytes;
+        $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        $factor = floor((strlen($bytes) - 1) / 3);
+        return sprintf('%.2f %s', $bytes / 1024 ** $factor, $size[$factor]);
     }
 }

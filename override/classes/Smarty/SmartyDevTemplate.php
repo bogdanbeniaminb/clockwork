@@ -43,4 +43,65 @@ class SmartyDevTemplate extends SmartyDevTemplateCore
 
         return $result;
     }
+
+    public function _subTemplateRender(
+        $template,
+        $cache_id,
+        $compile_id,
+        $caching,
+        $cache_lifetime,
+        $data,
+        $scope,
+        $forceTplCache,
+        $uid = null,
+        $content_func = null
+    ) {
+
+        $profiler = null;
+        if (_PS_MODE_DEV_) {
+            if (!class_exists(BB\Clockwork\Profiler::class)) {
+                @include_once(_PS_MODULE_DIR_ . 'clockwork/vendor/autoload.php');
+            }
+            if (class_exists(BB\Clockwork\Profiler::class)) {
+                $profiler = BB\Clockwork\Profiler::getInstance();
+            }
+            $start = microtime(true);
+        }
+
+
+        $result = parent::_subTemplateRender(
+            $template,
+            $cache_id,
+            $compile_id,
+            $caching,
+            $cache_lifetime,
+            $data,
+            $scope,
+            $forceTplCache,
+            $uid,
+            $content_func
+        );
+
+
+        if ($profiler) {
+            $end = microtime(true);
+
+            if (null !== $template) {
+                $tpl = json_encode($template);
+            } else {
+                $tpl = 'unknown';
+            }
+
+            $profiler->addView($tpl, [
+                'template' => $tpl,
+                'cache_id' => $cache_id,
+                'compile_id' => $compile_id,
+            ], [
+                'time' => $start,
+                'duration' => ($end - $start) * 1000,
+            ]);
+        }
+
+        return $result;
+    }
 }
