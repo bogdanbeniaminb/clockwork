@@ -56,13 +56,15 @@ class Clockwork extends Module
     //     ],
     // ];
 
-    // public $hooks = [];
+    public $hooks = [
+        'actionFrontControllerSetMedia'
+    ];
 
     public function __construct()
     {
         $this->name = 'clockwork';
         $this->tab = 'others';
-        $this->version = '1.0.9';
+        $this->version = '1.0.10';
         $this->author = 'Bogdan Barbu';
         $this->need_instance = 1;
         $this->ps_versions_compliancy = [
@@ -93,7 +95,8 @@ class Clockwork extends Module
         }
 
         // install hooks and tabs
-        if (!(new Installer($this))->install()) {
+        $installer = new Installer($this);
+        if (!$installer->install()) {
             return false;
         }
 
@@ -147,9 +150,26 @@ class Clockwork extends Module
         return $output;
     }
 
-    /** returns whether WebP is active */
-    public function clockworkActive()
+    /**
+     * returns whether WebP is active
+     */
+    public function clockworkActive(): bool
     {
         return (bool) Configuration::get('BB_CLOCKWORK_ENABLED');
+    }
+
+    public function hookActionFrontControllerSetMedia($params)
+    {
+        if (!_PS_MODE_DEV_) return;
+
+        $this->context->controller->registerJavascript(
+            'clockwork-toolbar',
+            'https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/toolbar.js',
+            [
+                'position' => 'bottom',
+                'priority' => 100,
+                'server' => 'remote',
+            ]
+        );
     }
 }

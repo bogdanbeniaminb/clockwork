@@ -35,6 +35,21 @@ class Installer
     protected $module = null;
 
     /**
+     * @var HooksInstaller
+     */
+    protected $hooksInstaller;
+
+    /**
+     * @var TabsInstaller
+     */
+    protected $tabsInstaller;
+
+    /**
+     * @var ConfigurationInstaller
+     */
+    protected $configurationInstaller;
+
+    /**
      * @param \Module $module
      */
     public function __construct($module)

@@ -34,7 +34,8 @@ class Profiler
         $this->clockwork = Clockwork::init([
             'register_helpers' => true,
             'storage_files_path' => __DIR__ . '/../storage/clockwork',
-            'api' => __PS_BASE_URI__ . 'modules/clockwork/actions/endpoint.php?request='
+            'api' => __PS_BASE_URI__ . 'modules/clockwork/actions/endpoint.php?request=',
+            'toolbar' => true,
         ]);
 
         $this->startTime = microtime(true);
