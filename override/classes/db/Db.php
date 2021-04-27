@@ -2,11 +2,11 @@
 
 abstract class Db extends DbCore
 {
-    public $disableCache = !!_PS_MODE_DEV_;
     public $count = 0;
     public $queries = [];
     public $uniqQueries = [];
     public $tables = [];
+
     public function query($sql)
     {
         if (!_PS_MODE_DEV_) {
@@ -27,7 +27,7 @@ abstract class Db extends DbCore
             ++$this->uniqQueries[$uniqSql];
 
             // No cache for query
-            if ($this->disableCache && !stripos($sql, 'SQL_NO_CACHE')) {
+            if (!$this->is_cache_enabled && !stripos($sql, 'SQL_NO_CACHE')) {
                 $sql = preg_replace('/^\s*select\s+/i', 'SELECT SQL_NO_CACHE ', trim($sql));
             }
 

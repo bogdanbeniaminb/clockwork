@@ -192,24 +192,29 @@ class Profiler
         foreach ($queries as $data) {
             $this->totalQueryTime += $data['time'];
 
+            $location = str_replace('\\', '/', substr($data['stack'][0]['file'], strlen(_PS_ROOT_DIR_))) . ':' . $data['stack'][0]['line'];
+            $file = str_replace('\\', '/', substr($data['stack'][0]['file'], strlen(_PS_ROOT_DIR_)));
+            $model = str_replace('.php', '', basename($file));
+
             $queryRow = [
                 'time' => $data['time'],
                 'query' => $data['query'],
-                'location' => str_replace('\\', '/', substr($data['stack'][0]['file'], strlen(_PS_ROOT_DIR_))) . ':' . $data['stack'][0]['line'],
+                'location' => $location,
                 'filesort' => false,
                 'rows' => 1,
                 'group_by' => false,
-                'stack' => [],
+                'stack' => $data['stack'] ?? [],
             ];
 
-            clock()->addDatabaseQuery(
+            $this->clock()->addDatabaseQuery(
                 $data['query'],
                 [],
                 $data['time'] * 1000,
                 [
-                    'file' => str_replace('\\', '/', substr($data['stack'][0]['file'], strlen(_PS_ROOT_DIR_))),
+                    'file' => $file,
                     'line' => $data['stack'][0]['line'],
                     'time' => $data['start'] ?? null,
+                    'model' => $model,
                 ]
             );
 
@@ -244,7 +249,7 @@ class Profiler
 
         // add the hooks
         foreach ($this->hooksPerfs as $hook_name => $data) {
-            clock()->event(sprintf("Hook: %s", $hook_name), [
+            $this->clock()->event(sprintf("Hook: %s", $hook_name), [
                 'name' => $hook_name,
                 'start' => $data['start'],
                 'end' => $data['start'] + $data['time'],
@@ -254,7 +259,7 @@ class Profiler
 
         // add the modules
         foreach ($this->modulesPerfs as $data) {
-            clock()->event(sprintf("Module (__construct): %s", $data['module']), [
+            $this->clock()->event(sprintf("Module (__construct): %s", $data['module']), [
                 'name' => $data['module'],
                 'start' => $data['start'],
                 'end' => $data['end'],
@@ -416,7 +421,7 @@ class Profiler
      */
     public function addView(...$args)
     {
-        clock()->addView(...$args);
+        $this->clock()->addView(...$args);
     }
 
     /**
