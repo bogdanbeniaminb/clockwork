@@ -1,6 +1,5 @@
 <?php
 
-use BB\Clockwork\Profiler;
 
 abstract class Controller extends ControllerCore
 {
@@ -9,11 +8,11 @@ abstract class Controller extends ControllerCore
     public function __construct()
     {
         if (_PS_MODE_DEV_) {
-            if (!class_exists(Profiler::class)) {
+            if (!class_exists(BB\Clockwork\Profiler::class)) {
                 include_once(_PS_MODULE_DIR_ . 'clockwork/vendor/autoload.php');
             }
-            if (class_exists(Profiler::class)) {
-                $this->profiler = Profiler::getInstance();
+            if (class_exists(BB\Clockwork\Profiler::class)) {
+                $this->profiler = BB\Clockwork\Profiler::getInstance();
                 $this->profiler->stamp('config');
                 $this->profiler->setController($this);
             }
@@ -83,6 +82,9 @@ abstract class Controller extends ControllerCore
                     $this->displayAjax();
                 }
 
+                if ($this->profiler) {
+                    $this->profiler->processData();
+                }
                 return;
             }
         } else {
