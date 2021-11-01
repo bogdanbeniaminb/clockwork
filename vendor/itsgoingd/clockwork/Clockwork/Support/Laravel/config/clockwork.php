@@ -30,8 +30,11 @@ return [
 		'cache' => [
 			'enabled' => env('CLOCKWORK_CACHE_ENABLED', true),
 
-			// Collect cache queries including results (high performance impact with a high number of queries)
-			'collect_queries' => env('CLOCKWORK_CACHE_QUERIES', false)
+			// Collect cache queries
+			'collect_queries' => env('CLOCKWORK_CACHE_QUERIES', true),
+
+			// Collect values from cache queries (high performance impact with a very high number of queries)
+			'collect_values' => env('CLOCKWORK_CACHE_COLLECT_VALUES', false)
 		],
 
 		// Database usage stats and queries
@@ -96,7 +99,10 @@ return [
 
 		// Routes list
 		'routes' => [
-			'enabled' => env('CLOCKWORK_ROUTES_ENABLED', false)
+			'enabled' => env('CLOCKWORK_ROUTES_ENABLED', false),
+
+			// Collect only routes from particular namespaces (only application routes by default)
+			'only_namespaces' => [ 'App' ]
 		],
 
 		// Rendered views
@@ -132,10 +138,11 @@ return [
 	|
 	| Clockwork can show a toolbar with basic metrics on all responses. Here you can enable or disable this feature.
 	| Requires a separate clockwork-browser npm library.
+	| For installation instructions see https://underground.works/clockwork/#docs-viewing-data
 	|
 	*/
 
-	'toolbar' => env('CLOCKWORK_TOOLBAR', false),
+	'toolbar' => env('CLOCKWORK_TOOLBAR', true),
 
 	/*
 	|------------------------------------------------------------------------------------------------------------------
@@ -168,6 +175,7 @@ return [
 		'except' => [
 			'/horizon/.*', // Laravel Horizon requests
 			'/telescope/.*', // Laravel Telescope requests
+			'/_debugbar/.*', // Laravel DebugBar requests
 		],
 
 		// List of URIs that should be collected, any other URI will not be collected if not empty

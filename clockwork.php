@@ -64,7 +64,7 @@ class Clockwork extends Module
     {
         $this->name = 'clockwork';
         $this->tab = 'others';
-        $this->version = '1.0.10';
+        $this->version = '1.0.11';
         $this->author = 'Bogdan Barbu';
         $this->need_instance = 1;
         $this->ps_versions_compliancy = [

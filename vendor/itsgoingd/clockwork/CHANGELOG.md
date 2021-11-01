@@ -1,3 +1,36 @@
+5.1
+
+- added initial support for Laravel Octane
+- added support for Web UI in the vanilla integration
+- added support for collecting Laravel cache queries without values (implemented by akalongman, thanks!)
+- added ability to filter Laravel routes from particular namespaces (idea by hailwood, thanks!)
+- improved collecting of request URL to include full URL including the query string
+- improved Clockwork Browser payload to include Web UI path
+- updated Clockwork App (5.1)
+- fixed logging falsy values via Clockwork::log (reported by Karmalakas, thanks!)
+- fixed PHP 8 incompatibility when processing some Laravel notifications (implemented by nanaya, thanks!)
+- fixed request body being collected even when already parsed into POST data
+- fixed collecting request URLs with non-standard ports
+
+5.0.8
+
+- fixed crash when collecting Laravel mailables built via MailMessage (implemented by cbl, thanks!)
+- fixed crash when collecting artisan command in Lumen (reported by 2Attack, thanks!)
+- fixed crash when collecting database queries in Laravel with connection implementation not using PDO (implemented by lenssoft, thanks!)
+- fixed crash when HTTP request body contains valid json which does not contain array (eg. a number) (reported by Mradxz, thanks!)
+- fixed collected jobs dispatched from other jobs not having a correct parent job set (implemented by josvar, thanks!)
+
+5.0.7
+
+- changed delay listening to events until the app is booted (improves comatibility with some other packages)
+- changed default settings to enable toolbar (separately installed component)
+- changed default except requests filter to include debugbar api (implemented by edgardmessias, thanks!)
+- fixed wrong type-hint for the timeline event run method (reported by hferradj, thanks!)
+- fixed on-demand mode not working in Laravel (reported by yemenifree, thanks!)
+- fixed crash when collecting Laravel notifications with recipient names (reported by iainheng, thanks!)
+- fixed possible crashes and other issues when collecting Laravel notifications (reported by beekmanbv, thanks!)
+- fixed crash when creating runnable queries in DBAL data source (implemented by N-M, thanks!)
+
 5.0.6
 
 - fixed vanilla integration overriding other cookies when used with a PSR-7 response (reported by leemason, thanks!)

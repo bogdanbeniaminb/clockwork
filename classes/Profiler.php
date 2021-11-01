@@ -206,6 +206,13 @@ class Profiler
                 'stack' => $data['stack'] ?? [],
             ];
 
+            // error_log('New Query! ' . "\n", 3, ABSPATH . '/clockwork.log');
+            // error_log('Query Duration : ' . ($data['time'] * 1000) . "ms\n", 3, ABSPATH . '/clockwork.log');
+            // error_log('Query File : ' . $file . "\n", 3, ABSPATH . '/clockwork.log');
+            // error_log('Query File Line : ' . $data['stack'][0]['line'] . "\n", 3, ABSPATH . '/clockwork.log');
+            // error_log('Model : ' . $model . "\n", 3, ABSPATH . '/clockwork.log');
+            // error_log('Query : ' . $data['query'] . "\n" . "\n", 3, ABSPATH . '/clockwork.log');
+
             $this->clock()->addDatabaseQuery(
                 $data['query'],
                 [],
@@ -335,6 +342,21 @@ class Profiler
             }
 
             $info->table('Modules', $modules);
+        }
+
+        // add the database stress table
+        if ($stress = Db::getInstance()->tables) {
+            $stress_info = [];
+            foreach ($stress as $table => $table_info) {
+                if (!is_array($table_info)) continue;
+                $stress_info[$table] = [
+                    'name' => $table,
+                    'count' => $table_info['count'],
+                    'duration (ms)' => (int) $table_info['duration'],
+                ];
+            }
+
+            $info->table('Table stress', $stress_info);
         }
 
         $this->sendData();
