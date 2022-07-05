@@ -64,7 +64,7 @@ class Clockwork extends Module
     {
         $this->name = 'clockwork';
         $this->tab = 'others';
-        $this->version = '1.0.11';
+        $this->version = '1.0.12';
         $this->author = 'Bogdan Barbu';
         $this->need_instance = 1;
         $this->ps_versions_compliancy = [
@@ -84,8 +84,6 @@ class Clockwork extends Module
         if (!Configuration::get('BB_CLOCKWORK_ENABLED')) {
             $this->warning = $this->l('Clockwork is not enabled.');
         }
-
-        PrestaShopLogger::addLog('Clockwork module started');
     }
 
     public function install()

@@ -31,14 +31,19 @@ class Profiler
 
     private function __construct()
     {
+        $this->startTime = microtime(true);
+
         $this->clockwork = Clockwork::init([
+            'features' => [
+                'performance' => [
+                    'client_metrics' => true,
+                ],
+            ],
             'register_helpers' => true,
             'storage_files_path' => __DIR__ . '/../storage/clockwork',
             'api' => __PS_BASE_URI__ . 'modules/clockwork/actions/endpoint.php?request=',
             'toolbar' => true,
         ]);
-
-        $this->startTime = microtime(true);
     }
 
     /**

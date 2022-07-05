@@ -1,7 +1,7 @@
 <?php
 
 
-abstract class Controller extends ControllerCore
+abstract class FrontController extends FrontControllerCore
 {
     protected $profiler = null;
 
