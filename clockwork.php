@@ -57,7 +57,8 @@ class Clockwork extends Module
     // ];
 
     public $hooks = [
-        'actionFrontControllerSetMedia'
+        'actionFrontControllerSetMedia',
+        'actionAjaxDieBefore',
     ];
 
     public function __construct()
@@ -154,6 +155,19 @@ class Clockwork extends Module
     public function clockworkActive(): bool
     {
         return (bool) Configuration::get('BB_CLOCKWORK_ENABLED');
+    }
+
+    public function hookActionAjaxDieBefore($params)
+    {
+        if (!_PS_MODE_DEV_) {
+            return;
+        }
+        $controller = $params['controller'];
+        if (!$controller instanceof FrontController) {
+            return;
+        }
+
+        Profiler::getInstance()->processData();
     }
 
     public function hookActionFrontControllerSetMedia($params)

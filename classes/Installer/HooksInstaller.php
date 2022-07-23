@@ -78,10 +78,7 @@ class HooksInstaller
     {
         if ($hooks = $this->getHooks()) {
             foreach ($hooks as $hook) {
-                $result = $this->module->unregisterHook($hook);
-                if (!$result) {
-                    return false;
-                }
+                $this->module->unregisterHook($hook);
             }
         }
         return true;

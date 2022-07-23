@@ -81,7 +81,6 @@ abstract class FrontController extends FrontControllerCore
                 } elseif (method_exists($this, 'displayAjax')) {
                     $this->displayAjax();
                 }
-
                 if ($this->profiler) {
                     $this->profiler->processData();
                 }

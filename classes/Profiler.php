@@ -9,6 +9,7 @@ use Clockwork\Support\Vanilla\Clockwork;
 use Db;
 use ObjectModel;
 use Configuration;
+use Context;
 
 class Profiler
 {
@@ -27,6 +28,8 @@ class Profiler
     protected $totalHooksMemory = 0;
     protected $startTime = 0;
 
+    protected $disabled = false;
+
     protected static $instance = null;
 
     private function __construct()
@@ -34,16 +37,19 @@ class Profiler
         $this->startTime = microtime(true);
 
         $this->clockwork = Clockwork::init([
-            'features' => [
-                'performance' => [
-                    'client_metrics' => true,
-                ],
-            ],
             'register_helpers' => true,
             'storage_files_path' => __DIR__ . '/../storage/clockwork',
             'api' => __PS_BASE_URI__ . 'modules/clockwork/actions/endpoint.php?request=',
             'toolbar' => true,
+            'web' => [
+                'enable' => __PS_BASE_URI__ . 'module/clockwork/web',
+                'path' => __DIR__ . '/../views/web/public',
+                'uri' =>  __PS_BASE_URI__ . 'modules/clockwork/views/web/public',
+            ],
         ]);
+
+        // send the data on shutdown anyway.
+        register_shutdown_function([$this, 'shutdown']);
     }
 
     /**
@@ -58,6 +64,18 @@ class Profiler
         }
 
         return static::$instance;
+    }
+
+    public function disable()
+    {
+        $this->disabled = true;
+        return $this;
+    }
+
+    public function enable()
+    {
+        $this->disabled = true;
+        return $this;
     }
 
     /**
@@ -170,6 +188,11 @@ class Profiler
      */
     public function processData()
     {
+        // Don't process if disabled.
+        if ($this->disabled) {
+            return;
+        }
+
         // Including a lot of files uses memory
         foreach (get_included_files() as $file) {
             $this->totalFilesize += filesize($file);
@@ -462,5 +485,16 @@ class Profiler
         $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = floor((strlen($bytes) - 1) / 3);
         return sprintf('%.2f %s', $bytes / 1024 ** $factor, $size[$factor]);
+    }
+
+    /**
+     * Send the data on shutdown anyway.
+     */
+    public function shutdown()
+    {
+        if (!_PS_MODE_DEV_) {
+            return;
+        }
+        $this->processData();
     }
 }

@@ -1,0 +1,5 @@
+Order Allow,Deny
+Allow from all
+Satisfy any
+
+RewriteRule web/__clockwork/(.*)$ /modules/clockwork/actions/endpoint.php?request=$1 [NC,L]
