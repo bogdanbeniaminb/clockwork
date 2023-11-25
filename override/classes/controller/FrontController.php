@@ -3,7 +3,7 @@
 
 abstract class FrontController extends FrontControllerCore
 {
-    protected $profiler = null;
+    public $profiler = null;
 
     public function __construct()
     {

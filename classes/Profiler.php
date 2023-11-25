@@ -260,7 +260,7 @@ class Profiler
                 }
 
                 foreach ($explain as $row) {
-                    $queryRow['rows'] *= $row['rows'];
+                    $queryRow['rows'] *= (int) $row['rows'];
                 }
 
                 if (stristr($data['query'], 'group by') && !preg_match('/(avg|count|min|max|group_concat|sum)\s*\(/i', $data['query'])) {

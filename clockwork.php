@@ -19,6 +19,7 @@
  */
 
 use BB\Clockwork\Installer\Installer;
+use BB\Clockwork\Profiler;
 
 if (!defined('_PS_VERSION_')) {
     exit();
@@ -58,6 +59,8 @@ class Clockwork extends Module
 
     public $hooks = [
         'actionFrontControllerSetMedia',
+        'actionAdminControllerSetMedia',
+        'displayAdminEndContent',
         'actionAjaxDieBefore',
     ];
 
@@ -65,7 +68,7 @@ class Clockwork extends Module
     {
         $this->name = 'clockwork';
         $this->tab = 'others';
-        $this->version = '1.0.12';
+        $this->version = '1.0.13';
         $this->author = 'Bogdan Barbu';
         $this->need_instance = 1;
         $this->ps_versions_compliancy = [
@@ -73,7 +76,6 @@ class Clockwork extends Module
             'max' => _PS_VERSION_,
         ];
         $this->bootstrap = true;
-        $this->secure_key = Tools::encrypt($this->name);
 
         parent::__construct();
 
@@ -183,5 +185,24 @@ class Clockwork extends Module
                 'server' => 'remote',
             ]
         );
+    }
+
+    public function hookActionAdminControllerSetMedia($params)
+    {
+        if (!_PS_MODE_DEV_) return;
+
+        /** @var AdminController $controller */
+        $controller = $this->context->controller;
+        $controller->addJS(
+            'https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/toolbar.js',
+            false
+        );
+    }
+
+    public function hookDisplayAdminEndContent($params)
+    {
+        if (!_PS_MODE_DEV_) return;
+
+        Profiler::getInstance()->processData();
     }
 }
