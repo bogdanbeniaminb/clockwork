@@ -276,9 +276,11 @@ class Profiler
             $this->queries[] = $queryRow;
         }
 
-        uasort(ObjectModel::$debug_list, function ($a, $b) {
-            return (count($a) < count($b)) ? 1 : -1;
-        });
+        if (property_exists(ObjectModel::class, 'debug_list')) {
+            uasort(ObjectModel::$debug_list, function ($a, $b) {
+                return (count($a) < count($b)) ? 1 : -1;
+            });
+        }
         arsort(Db::getInstance()->tables);
         arsort(Db::getInstance()->uniqQueries);
 
@@ -435,7 +437,10 @@ class Profiler
             'stopwatchQueries' => $this->queries,
             'doublesQueries' => Db::getInstance()->uniqQueries,
             'tableStress' => Db::getInstance()->tables,
-            'objectmodel' => ObjectModel::$debug_list,
+            'objectmodel' => property_exists(
+                ObjectModel::class,
+                'debug_list'
+            ) ? ObjectModel::$debug_list : [],
             'files' => get_included_files(),
         ];
 
