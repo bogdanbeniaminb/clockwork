@@ -29,6 +29,7 @@ class Profiler
     protected $startTime = 0;
 
     protected $disabled = false;
+    protected $sent = false;
 
     protected static $instance = null;
 
@@ -190,6 +191,11 @@ class Profiler
     {
         // Don't process if disabled.
         if ($this->disabled) {
+            return;
+        }
+
+        // Don't process if already sent.
+        if ($this->sent) {
             return;
         }
 
@@ -452,6 +458,11 @@ class Profiler
      */
     public function sendData()
     {
+        if ($this->sent) {
+            return;
+        }
+
+        $this->sent = true;
         $this->clockwork->requestProcessed();
     }
 
