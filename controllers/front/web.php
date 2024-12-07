@@ -31,7 +31,7 @@ class ClockworkWebModuleFrontController extends ModuleFrontController
         ]);
 
         $clockwork->returnWeb();
-        $this->profiler->disable();
+        $this->clockworkProfiler->disable();
         exit();
 
         // $index = (new Web)->asset('index.html');

@@ -10,6 +10,9 @@ use Db;
 use ObjectModel;
 use Configuration;
 use Context;
+use PrestaShopLogger;
+use PrestaShopLoggerCore;
+use Psr\Log\LogLevel;
 
 class Profiler
 {
@@ -18,6 +21,9 @@ class Profiler
     protected $hooksPerfs = [];
     protected $modulesPerfs = [];
     protected $profiler = [];
+
+    protected $globalVarSize = [];
+    protected $totalCacheSize = 0;
 
     protected $totalFilesize = 0;
     protected $totalGlobalVarSize = 0;
@@ -33,9 +39,14 @@ class Profiler
 
     protected static $instance = null;
 
+    public $queries = [];
+
     private function __construct()
     {
         $this->startTime = microtime(true);
+
+        // Explicitly enable clockwork
+        $_ENV['CLOCKWORK_ENABLE'] = _PS_MODE_DEV_;
 
         $this->clockwork = Clockwork::init([
             'register_helpers' => true,
@@ -144,7 +155,7 @@ class Profiler
             return $var;
         }
 
-        return (string) $var;
+        return @strval($var);
     }
 
     /**
@@ -181,6 +192,25 @@ class Profiler
         $this->modulesPerfs[] = $params;
         $this->totalModulesTime += $params['time'];
         $this->totalModulesMemory += $params['memory'];
+    }
+
+    /**
+     * Intercept PS log
+     *
+     * @param PrestaShopLoggerCore $log
+     */
+    public function interceptPsLog(PrestaShopLoggerCore $log)
+    {
+        $levels = [
+            PrestaShopLoggerCore::LOG_SEVERITY_LEVEL_INFORMATIVE => LogLevel::INFO,
+            PrestaShopLoggerCore::LOG_SEVERITY_LEVEL_WARNING => LogLevel::WARNING,
+            PrestaShopLoggerCore::LOG_SEVERITY_LEVEL_ERROR => LogLevel::ERROR,
+            PrestaShopLoggerCore::LOG_SEVERITY_LEVEL_MAJOR => LogLevel::CRITICAL,
+        ];
+
+        $this->clock()->getClockwork()->log($levels[$log->severity], $log->message . '(' . $log->object_type . ' - ' . $log->object_id . ')', [
+            'trace' => $log->severity >= PrestaShopLoggerCore::LOG_SEVERITY_LEVEL_ERROR,
+        ]);
     }
 
     /**
@@ -342,10 +372,16 @@ class Profiler
         // add the table with hooks
         if ($this->hooksPerfs) {
             $hooks = [];
+
+            // sort by time
+            uasort($this->hooksPerfs, function ($a, $b) {
+                return $b['time'] <=> $a['time'];
+            });
+
             foreach ($this->hooksPerfs as $hook_name => $data) {
                 $hooks[] = [
                     'name' => $hook_name,
-                    'duration' => round($data['time'] * 1000, 1) . 'ms',
+                    'duration' => round($data['time'] * 1000, 1) . ' ms',
                     'memory' => $data['memory'],
                 ];
             }
@@ -360,6 +396,8 @@ class Profiler
         // add the modules table
         if ($this->modulesPerfs) {
             $modules = [];
+
+
             foreach ($this->modulesPerfs as $data) {
                 $name = $data['module'];
                 if (!isset($modules[$name])) {
@@ -373,7 +411,13 @@ class Profiler
                 $modules[$name]['memory'] += $data['memory'];
             }
 
+            // sort by time
+            uasort($modules, function ($a, $b) {
+                return $b['duration'] <=> $a['duration'];
+            });
+
             foreach ($modules as &$module) {
+                $module['duration'] = round($module['duration'], 2) . ' ms';
                 $module['memory'] = $this->getHumanReadableSize($module['memory']);
             }
 
@@ -383,12 +427,19 @@ class Profiler
         // add the database stress table
         if ($stress = Db::getInstance()->tables) {
             $stress_info = [];
+
+
+            // sort by time
+            uasort($stress_info, function ($a, $b) {
+                return $b['duration'] <=> $a['duration'];
+            });
+
             foreach ($stress as $table => $table_info) {
                 if (!is_array($table_info)) continue;
                 $stress_info[$table] = [
                     'name' => $table,
-                    'count' => $table_info['count'],
-                    'duration (ms)' => (int) $table_info['duration'],
+                    'count' => $table_info['count'] . ' queries',
+                    'duration (ms)' => ((int) $table_info['duration']) . ' ms',
                 ];
             }
 

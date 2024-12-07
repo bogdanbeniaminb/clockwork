@@ -108,6 +108,10 @@ class Clockwork extends Module
             }
         }
 
+        $this->registerHook([
+            'actionObjectAddBefore',
+        ]);
+
         return true;
     }
 
@@ -204,5 +208,26 @@ class Clockwork extends Module
         if (!_PS_MODE_DEV_) return;
 
         Profiler::getInstance()->processData();
+    }
+
+    /**
+     * Send logs to sentry when PrestaShopLogger is used.
+     * @param array{
+     *   object: ObjectModel,
+     * } $params
+     * @return void
+     */
+    public function hookActionObjectAddBefore($params)
+    {
+        $log = $params['object'] ?? null;
+        if (!($log instanceof PrestaShopLoggerCore)) {
+            return;
+        }
+
+        if (!_PS_MODE_DEV_) {
+            return;
+        }
+
+        Profiler::getInstance()->interceptPsLog($log);
     }
 }

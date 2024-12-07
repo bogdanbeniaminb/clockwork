@@ -3,25 +3,25 @@
 
 abstract class FrontController extends FrontControllerCore
 {
-    public $profiler = null;
+    public $clockworkProfiler = null;
 
     public function __construct()
     {
         if (_PS_MODE_DEV_) {
             if (!class_exists(BB\Clockwork\Profiler::class)) {
-                include_once(_PS_MODULE_DIR_ . 'clockwork/vendor/autoload.php');
+                Module::getInstanceByName('clockwork');
             }
             if (class_exists(BB\Clockwork\Profiler::class)) {
-                $this->profiler = BB\Clockwork\Profiler::getInstance();
-                $this->profiler->stamp('config');
-                $this->profiler->setController($this);
+                $this->clockworkProfiler = BB\Clockwork\Profiler::getInstance();
+                $this->clockworkProfiler->stamp('config');
+                $this->clockworkProfiler->setController($this);
             }
         }
 
         parent::__construct();
 
-        if (_PS_MODE_DEV_ && $this->profiler) {
-            $this->profiler->stamp('__construct');
+        if (_PS_MODE_DEV_ && $this->clockworkProfiler) {
+            $this->clockworkProfiler->stamp('__construct');
         }
     }
 
@@ -33,43 +33,43 @@ abstract class FrontController extends FrontControllerCore
         }
 
         $this->init();
-        if ($this->profiler) {
-            $this->profiler->stamp('init');
+        if ($this->clockworkProfiler) {
+            $this->clockworkProfiler->stamp('init');
         }
 
         if ($this->checkAccess()) {
-            if ($this->profiler) {
-                $this->profiler->stamp('checkAccess');
+            if ($this->clockworkProfiler) {
+                $this->clockworkProfiler->stamp('checkAccess');
             }
 
             if (!$this->content_only && ($this->display_header || !empty($this->className))) {
                 $this->setMedia();
-                if ($this->profiler) {
-                    $this->profiler->stamp('setMedia');
+                if ($this->clockworkProfiler) {
+                    $this->clockworkProfiler->stamp('setMedia');
                 }
             }
 
             $this->postProcess();
-            if ($this->profiler) {
-                $this->profiler->stamp('postProcess');
+            if ($this->clockworkProfiler) {
+                $this->clockworkProfiler->stamp('postProcess');
             }
 
             if (!$this->content_only && ($this->display_header || !empty($this->className))) {
                 $this->initHeader();
-                if ($this->profiler) {
-                    $this->profiler->stamp('initHeader');
+                if ($this->clockworkProfiler) {
+                    $this->clockworkProfiler->stamp('initHeader');
                 }
             }
 
             $this->initContent();
-            if ($this->profiler) {
-                $this->profiler->stamp('initContent');
+            if ($this->clockworkProfiler) {
+                $this->clockworkProfiler->stamp('initContent');
             }
 
             if (!$this->content_only && ($this->display_footer || !empty($this->className))) {
                 $this->initFooter();
-                if ($this->profiler) {
-                    $this->profiler->stamp('initFooter');
+                if ($this->clockworkProfiler) {
+                    $this->clockworkProfiler->stamp('initFooter');
                 }
             }
 
@@ -81,8 +81,8 @@ abstract class FrontController extends FrontControllerCore
                 } elseif (method_exists($this, 'displayAjax')) {
                     $this->displayAjax();
                 }
-                if ($this->profiler) {
-                    $this->profiler->processData();
+                if ($this->clockworkProfiler) {
+                    $this->clockworkProfiler->processData();
                 }
                 return;
             }
@@ -119,17 +119,17 @@ abstract class FrontController extends FrontControllerCore
             }
 
             $content .= $displayOutput;
-            if ($this->profiler) {
-                $this->profiler->stamp('display');
+            if ($this->clockworkProfiler) {
+                $this->clockworkProfiler->stamp('display');
             }
         }
 
         // Process all profiling data
-        if ($this->profiler) {
-            $this->profiler->processData();
+        if ($this->clockworkProfiler) {
+            $this->clockworkProfiler->processData();
 
             $this->context->smarty->assign(
-                $this->profiler->getSmartyVariables()
+                $this->clockworkProfiler->getSmartyVariables()
             );
         }
 
