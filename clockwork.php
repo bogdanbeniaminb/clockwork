@@ -20,6 +20,7 @@
 
 use BB\Clockwork\Installer\Installer;
 use BB\Clockwork\Profiler;
+use Symfony\Component\Filesystem\Filesystem;
 
 if (!defined('_PS_VERSION_')) {
     exit();
@@ -111,6 +112,17 @@ class Clockwork extends Module
         $this->registerHook([
             'actionObjectAddBefore',
         ]);
+
+        // Copy the web assets to the views/web/public folder
+        $filesystem = new Filesystem();
+        $filesystem->mkdir($webFolder = _PS_MODULE_DIR_ . 'clockwork/views/web/public');
+        $filesystem->mirror(
+            CLOCKWORK_DIR . '/vendor/itsgoingd/clockwork/Clockwork/Web',
+            $webFolder,
+        );
+
+        // Remove the .htaccess
+        $filesystem->remove($webFolder . '/.htaccess');
 
         return true;
     }
