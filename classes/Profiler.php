@@ -230,8 +230,13 @@ class Profiler
         }
 
         // Including a lot of files uses memory
-        foreach (get_included_files() as $file) {
-            $this->totalFilesize += filesize($file);
+        try {
+            foreach (get_included_files() as $file) {
+                $this->totalFilesize += filesize($file);
+            }
+        } catch (Exception $e) {
+            // If we can't get the filesize, we just ignore it.
+            // This can happen on some filesystems.
         }
 
         foreach ($GLOBALS as $key => $value) {
